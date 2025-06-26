@@ -1,4 +1,3 @@
-
 import Link from 'next/link';
 
 export default function Layout({ children }) {
@@ -10,6 +9,7 @@ export default function Layout({ children }) {
           <Link href="/" className="hover:underline">Home</Link>
           <Link href="/upload" className="hover:underline">Upload</Link>
           <Link href="/buyer" className="hover:underline">Buyer</Link>
+          <Link href="/seller" className="hover:underline">Seller</Link>
         </nav>
       </aside>
       <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
@@ -18,4 +18,3 @@ export default function Layout({ children }) {
     </div>
   );
 }
-<Link href="/seller" className="hover:underline">Seller</Link>
