@@ -18,3 +18,4 @@ export default function Layout({ children }) {
     </div>
   );
 }
+<Link href="/seller" className="hover:underline">Seller</Link>
