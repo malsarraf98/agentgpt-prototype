@@ -11,7 +11,7 @@ export default function Layout({ children }) {
           <Link href="/buyer" className="hover:underline">Buyer</Link>
           <Link href="/seller" className="hover:underline">Seller</Link>
           <Link href="/market-summary" className="hover:underline">Market Summary</Link>
-          <Link href="/agent-stats" className="hover:underline">Agent Stats</Link>
+          <Link href="/performance" className="hover:underline">Performance</Link>
           <Link href="/clients" className="hover:underline">Clients</Link>
         </nav>
       </aside>
