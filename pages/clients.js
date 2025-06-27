@@ -1,123 +1,61 @@
-import { useState, useEffect } from "react";
-
-const defaultClients = [
-  {
-    id: 1,
-    name: "John & Mary Thompson",
-    type: "Buyer",
-    budget: "$1.5M",
-    status: "Actively looking",
-    nextStep: "Send 5 new comps + schedule tour Friday",
-    history: [
-      {
-        date: "June 20, 2025",
-        summary: "Looking for a starter home in Newton around $1.5M. Wants 3+ beds, good school district. Flexible timeline."
-      }
-    ]
-  },
-  {
-    id: 2,
-    name: "Karen Li",
-    type: "Seller",
-    budget: "$950K",
-    status: "Preparing to list",
-    nextStep: "Email listing agreement + stager contact",
-    history: [
-      {
-        date: "June 18, 2025",
-        summary: "Discussed pricing strategy and staging. Target list date: July 10."
-      }
-    ]
-  }
-];
+import { useEffect, useState } from "react";
 
 export default function Clients() {
   const [clients, setClients] = useState([]);
-  const [activeEmail, setActiveEmail] = useState(null);
 
-  // Load from localStorage or set defaults
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem("agentgpt-crm"));
-      if (saved && Array.isArray(saved) && saved.length > 0) {
-        setClients(saved);
-      } else {
-        localStorage.setItem("agentgpt-crm", JSON.stringify(defaultClients));
-        setClients(defaultClients);
-      }
-    } catch (err) {
-      // If localStorage is broken or corrupted
-      localStorage.setItem("agentgpt-crm", JSON.stringify(defaultClients));
-      setClients(defaultClients);
-    }
+    const stored = JSON.parse(localStorage.getItem("agentgpt-crm")) || [];
+    setClients(stored);
   }, []);
-
-  const generateEmail = (client) => {
-    const latest = client.history?.[0]?.summary || "No recent summary.";
-    const email = `
-Hi ${client.name.split(" ")[0]},
-
-It was great speaking with you. Here’s a quick summary of where we left off:
-
-– ${latest}
-– Next Step: ${client.nextStep}
-
-Let me know if you have any questions or if you'd like to schedule anything else this week.
-
-Best,  
-Your Agent
-    `.trim();
-
-    setActiveEmail(email);
-  };
-
-  const resetCRM = () => {
-    localStorage.setItem("agentgpt-crm", JSON.stringify(defaultClients));
-    setClients(defaultClients);
-    alert("CRM reset to default data.");
-  };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Client Dashboard</h1>
-      <button
-        onClick={resetCRM}
-        className="mb-4 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
-      >
-        🔁 Reset CRM
-      </button>
+      <h1 className="text-2xl font-bold mb-6">Client Dashboard</h1>
+      {clients.length === 0 ? (
+        <p>No clients yet.</p>
+      ) : (
+        clients.map((client) => (
+          <div key={client.name} className="mb-8 bg-white p-6 rounded shadow">
+            <h2 className="text-xl font-semibold mb-2">{client.name}</h2>
+            <p className="mb-1 text-sm text-gray-600">
+              {client.type === "buyer"
+                ? `Buyer • Budget: ${client.budget} • Area: ${client.zip}`
+                : `Seller • Property: ${client.property} • Goal: ${client.goal}`}
+            </p>
 
-      <div className="grid gap-6">
-        {clients.map(client => (
-          <div key={client.name} className="bg-white p-4 rounded shadow">
-            <h2 className="text-xl font-semibold">{client.name} <span className="text-sm text-gray-500 ml-2">({client.type})</span></h2>
-            <p className="text-sm text-gray-500 mb-2">Status: {client.status} | Budget: {client.budget}</p>
-            <p className="mb-2"><strong>Next Step:</strong> {client.nextStep}</p>
+            {client.nextStep && (
+              <div className="mt-2 p-3 border border-blue-200 bg-blue-50 rounded">
+                <p className="text-sm font-medium text-blue-800">Next Step:</p>
+                <p className="text-blue-900">{client.nextStep}</p>
+                {client.dueDate && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    Due: {client.dueDate}
+                  </p>
+                )}
+              </div>
+            )}
 
-            <div className="mb-4">
-              <h3 className="font-semibold mb-1">Meeting History:</h3>
-              <ul className="list-disc pl-5 space-y-1 text-sm">
-                {client.history?.map((item, idx) => (
-                  <li key={idx}><strong>{item.date}:</strong> {item.summary}</li>
-                ))}
-              </ul>
-            </div>
-
-            <button
-              onClick={() => generateEmail(client)}
-              className="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700"
-            >
-              Generate Follow-Up Email
-            </button>
+            {client.history && client.history.length > 0 && (
+              <div className="mt-4">
+                <h3 className="font-semibold mb-2">Meeting History:</h3>
+                <ul className="space-y-2">
+                  {client.history.map((entry, index) => (
+                    <li key={index} className="bg-gray-100 p-3 rounded">
+                      <p className="text-sm mb-1">🗓️ {entry.date}</p>
+                      <p className="text-gray-700 text-sm">{entry.summary}</p>
+                      {entry.nextStep && (
+                        <p className="text-sm text-gray-600 mt-1">
+                          Next Step: {entry.nextStep}
+                          {entry.dueDate ? ` (Due: ${entry.dueDate})` : ""}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-        ))}
-      </div>
-
-      {activeEmail && (
-        <div className="mt-10 bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-bold mb-2">Generated Email</h2>
-          <pre className="whitespace-pre-wrap">{activeEmail}</pre>
-        </div>
+        ))
       )}
     </div>
   );
