@@ -1,72 +1,52 @@
 import { useState } from "react";
+import Layout from "../components/Layout";
 
 export default function MarketSummary() {
-  const [formData, setFormData] = useState({
-    town: "",
-    quarter: ""
-  });
+  const [prompt, setPrompt] = useState("");
+  const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [summary, setSummary] = useState(null);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setResult("");
 
-    setSummary({
-      stats: {
-        totalSales: 112,
-        medianPrice: "$1.43M",
-        medianDOM: 8,
-        overAsk: "64%"
-      },
-      commentary: `In Q${formData.quarter}, ${formData.town} saw strong demand with 64% of homes selling above asking. Inventory remains low, keeping competition high. The median sale price climbed slightly while time on market dropped to just 8 days.`
+    const res = await fetch("/api/market-summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
     });
+
+    const data = await res.json();
+    setResult(data.result);
+    setLoading(false);
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">Quarterly Market Summary</h1>
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
-        <input
-          name="town"
-          placeholder="Town (e.g., Newton)"
-          className="w-full px-4 py-2 border rounded"
-          onChange={handleChange}
-        />
-        <input
-          name="quarter"
-          placeholder="Quarter (1, 2, 3, 4)"
-          className="w-full px-4 py-2 border rounded"
-          onChange={handleChange}
+    <Layout>
+      <h1 className="text-2xl font-bold mb-4">Market Summary</h1>
+      <form onSubmit={handleSubmit} className="mb-6 space-y-4">
+        <textarea
+          className="w-full p-3 border rounded shadow-sm"
+          rows={4}
+          placeholder="E.g. Q2 summary for Weston, MA"
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
         />
         <button
           type="submit"
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          disabled={loading}
         >
-          Generate Summary
+          {loading ? "Generating..." : "Get Market Summary"}
         </button>
       </form>
 
-      {summary && (
-        <div className="mt-6 space-y-4">
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-xl font-semibold mb-2">Stats</h2>
-            <ul className="list-disc list-inside">
-              <li>Total Sales: {summary.stats.totalSales}</li>
-              <li>Median Sale Price: {summary.stats.medianPrice}</li>
-              <li>Median Days on Market: {summary.stats.medianDOM}</li>
-              <li>% Over Ask: {summary.stats.overAsk}</li>
-            </ul>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <h2 className="text-xl font-semibold mb-2">Market Commentary</h2>
-            <p>{summary.commentary}</p>
-          </div>
+      {result && (
+        <div className="bg-white p-4 rounded shadow whitespace-pre-wrap border">
+          {result}
         </div>
       )}
-    </div>
+    </Layout>
   );
 }
