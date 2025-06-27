@@ -25,6 +25,25 @@ const mockClients = [
 
 export default function Clients() {
   const [clients, setClients] = useState(mockClients);
+  const [activeEmail, setActiveEmail] = useState(null);
+
+  const generateEmail = (client) => {
+    const email = `
+Hi ${client.name.split(" ")[0]},
+
+It was great speaking with you. Here’s a quick summary of where we left off:
+
+– ${client.summary}
+– Next Step: ${client.nextStep}
+
+Let me know if you have any questions or if you'd like to schedule anything else this week.
+
+Best,  
+Your Agent  
+    `.trim();
+
+    setActiveEmail(email);
+  };
 
   return (
     <div>
@@ -39,12 +58,22 @@ export default function Clients() {
             <p className="text-gray-800 mb-2"><strong>Last Meeting:</strong> {client.lastMeeting}</p>
             <p className="mb-2"><strong>Summary:</strong> {client.summary}</p>
             <p className="mb-4"><strong>Next Step:</strong> {client.nextStep}</p>
-            <button className="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700">
+            <button
+              onClick={() => generateEmail(client)}
+              className="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700"
+            >
               Generate Follow-Up Email
             </button>
           </div>
         ))}
       </div>
+
+      {activeEmail && (
+        <div className="mt-10 bg-white p-6 rounded shadow">
+          <h2 className="text-xl font-bold mb-2">Generated Email</h2>
+          <pre className="whitespace-pre-wrap">{activeEmail}</pre>
+        </div>
+      )}
     </div>
   );
 }
