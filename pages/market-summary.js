@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Layout from "../components/Layout";
 
 export default function MarketSummary() {
   const [prompt, setPrompt] = useState("");
@@ -23,7 +22,7 @@ export default function MarketSummary() {
   };
 
   return (
-    <Layout>
+    <>
       <h1 className="text-2xl font-bold mb-4">Market Summary</h1>
       <form onSubmit={handleSubmit} className="mb-6 space-y-4">
         <textarea
@@ -47,6 +46,6 @@ export default function MarketSummary() {
           {result}
         </div>
       )}
-    </Layout>
+    </>
   );
 }
