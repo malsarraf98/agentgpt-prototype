@@ -1,80 +1,92 @@
-import { useState } from "react";
-
-const mockClients = ["John & Mary Thompson", "Karen Li"];
+import { useState, useEffect } from "react";
 
 export default function Upload() {
+  const [summary, setSummary] = useState("");
+  const [file, setFile] = useState(null);
   const [selectedClient, setSelectedClient] = useState("");
-  const [transcript, setTranscript] = useState("");
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState("");
+  const [clients, setClients] = useState([]);
 
-  const handleSubmit = () => {
-    if (!selectedClient || !transcript) return;
+  useEffect(() => {
+    const storedClients = JSON.parse(localStorage.getItem("agentgpt-crm")) || [];
+    setClients(storedClients);
+  }, []);
 
-    // Load existing CRM from localStorage
-    const stored = JSON.parse(localStorage.getItem("agentgpt-crm")) || [];
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
 
-    // Find the client
-    const updated = stored.map(client => {
-      if (client.name === selectedClient) {
-        return {
-          ...client,
-          history: [
-            {
-              date: new Date().toLocaleDateString(),
-              summary: transcript,
-            },
-            ...(client.history || []),
-          ],
-        };
-      }
-      return client;
-    });
+  const handleUpload = async () => {
+    if (!file || !selectedClient) {
+      alert("Please select a file and client.");
+      return;
+    }
 
-    localStorage.setItem("agentgpt-crm", JSON.stringify(updated));
-    setTranscript("");
-    setSelectedClient("");
-    setSubmitted(true);
+    setStatus("Processing...");
+
+    // Simulate GPT summary generation
+    setTimeout(() => {
+      const mockSummary = `Call Summary: Discussed buyer's timeline, interest in 3-bed homes in Newton, and financing questions.`;
+
+      const updatedClients = clients.map(client => {
+        if (client.name === selectedClient) {
+          return {
+            ...client,
+            history: [
+              {
+                date: new Date().toLocaleDateString(),
+                summary: mockSummary
+              },
+              ...(client.history || [])
+            ]
+          };
+        }
+        return client;
+      });
+
+      setSummary(mockSummary);
+      setStatus("Summary complete.");
+      setClients(updatedClients);
+      localStorage.setItem("agentgpt-crm", JSON.stringify(updatedClients));
+    }, 1500);
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Upload Meeting Summary</h1>
+      <h1 className="text-2xl font-bold mb-4">Upload a Call Transcript</h1>
 
-      <div className="bg-white p-6 rounded shadow max-w-xl">
-        <label className="block mb-2 font-medium">Assign to Client</label>
+      <div className="mb-4">
+        <label className="block text-sm font-medium mb-1">Select Client</label>
         <select
-          className="w-full border rounded p-2 mb-4"
+          className="w-full border p-2 rounded"
           value={selectedClient}
           onChange={(e) => setSelectedClient(e.target.value)}
         >
-          <option value="">Select client</option>
-          {mockClients.map((name, idx) => (
-            <option key={idx} value={name}>{name}</option>
+          <option value="">-- Choose a client --</option>
+          {clients.map((client) => (
+            <option key={client.name} value={client.name}>{client.name}</option>
           ))}
         </select>
-
-        <label className="block mb-2 font-medium">Paste Transcript or Summary</label>
-        <textarea
-          className="w-full border rounded p-2 mb-4"
-          rows={5}
-          placeholder="Paste transcript here..."
-          value={transcript}
-          onChange={(e) => setTranscript(e.target.value)}
-        />
-
-        <button
-          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-          onClick={handleSubmit}
-        >
-          Save Summary
-        </button>
-
-        {submitted && (
-          <div className="mt-4 text-green-600">
-            Summary saved for <strong>{selectedClient}</strong>!
-          </div>
-        )}
       </div>
+
+      <div className="mb-4">
+        <input type="file" onChange={handleFileChange} className="border p-2" />
+      </div>
+
+      <button
+        onClick={handleUpload}
+        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+      >
+        Generate Summary
+      </button>
+
+      {status && <p className="mt-4 text-sm text-gray-600">{status}</p>}
+      {summary && (
+        <div className="mt-6 bg-white p-4 rounded shadow">
+          <h2 className="text-xl font-bold mb-2">Summary</h2>
+          <p>{summary}</p>
+        </div>
+      )}
     </div>
   );
 }
