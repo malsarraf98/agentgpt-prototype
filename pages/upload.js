@@ -10,9 +10,30 @@ export default function Upload() {
   const [showSaveButton, setShowSaveButton] = useState(false);
 
   useEffect(() => {
-    const storedClients = JSON.parse(localStorage.getItem("agentgpt-crm")) || [];
-    setClients(storedClients);
-  }, []);
+  let storedClients = JSON.parse(localStorage.getItem("agentgpt-crm"));
+
+  if (!storedClients || storedClients.length === 0) {
+    storedClients = [
+      {
+        name: "John & Mary Li",
+        type: "buyer",
+        budget: "$1.5M",
+        zip: "Newton, MA",
+        history: [],
+      },
+      {
+        name: "Susan Feld",
+        type: "seller",
+        property: "3BR condo in Brookline",
+        goal: "List in July",
+        history: [],
+      },
+    ];
+    localStorage.setItem("agentgpt-crm", JSON.stringify(storedClients));
+  }
+
+  setClients(storedClients);
+}, []);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
