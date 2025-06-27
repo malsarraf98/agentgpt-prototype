@@ -11,9 +11,9 @@ const defaultClients = [
     history: [
       {
         date: "June 20, 2025",
-        summary: "Looking for a starter home in Newton around $1.5M. Wants 3+ beds, good school district. Flexible timeline.",
-      },
-    ],
+        summary: "Looking for a starter home in Newton around $1.5M. Wants 3+ beds, good school district. Flexible timeline."
+      }
+    ]
   },
   {
     id: 2,
@@ -25,21 +25,28 @@ const defaultClients = [
     history: [
       {
         date: "June 18, 2025",
-        summary: "Discussed pricing strategy and staging. Target list date: July 10.",
-      },
-    ],
-  },
+        summary: "Discussed pricing strategy and staging. Target list date: July 10."
+      }
+    ]
+  }
 ];
 
 export default function Clients() {
   const [clients, setClients] = useState([]);
   const [activeEmail, setActiveEmail] = useState(null);
 
+  // Load from localStorage or set defaults
   useEffect(() => {
-    const saved = localStorage.getItem("agentgpt-crm");
-    if (saved) {
-      setClients(JSON.parse(saved));
-    } else {
+    try {
+      const saved = JSON.parse(localStorage.getItem("agentgpt-crm"));
+      if (saved && Array.isArray(saved) && saved.length > 0) {
+        setClients(saved);
+      } else {
+        localStorage.setItem("agentgpt-crm", JSON.stringify(defaultClients));
+        setClients(defaultClients);
+      }
+    } catch (err) {
+      // If localStorage is broken or corrupted
       localStorage.setItem("agentgpt-crm", JSON.stringify(defaultClients));
       setClients(defaultClients);
     }
@@ -58,16 +65,27 @@ It was great speaking with you. Here’s a quick summary of where we left off:
 Let me know if you have any questions or if you'd like to schedule anything else this week.
 
 Best,  
-Your Agent  
+Your Agent
     `.trim();
 
     setActiveEmail(email);
   };
 
+  const resetCRM = () => {
+    localStorage.setItem("agentgpt-crm", JSON.stringify(defaultClients));
+    setClients(defaultClients);
+    alert("CRM reset to default data.");
+  };
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-4">Client Dashboard</h1>
-      <p className="mb-6">Track conversations, generate follow-ups, and prep comps with one click.</p>
+      <button
+        onClick={resetCRM}
+        className="mb-4 bg-red-500 text-white px-4 py-1 rounded hover:bg-red-600"
+      >
+        🔁 Reset CRM
+      </button>
 
       <div className="grid gap-6">
         {clients.map(client => (
