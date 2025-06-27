@@ -1,163 +1,119 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function Upload() {
   const [summary, setSummary] = useState("");
-  const [file, setFile] = useState(null);
-  const [selectedClient, setSelectedClient] = useState("");
-  const [status, setStatus] = useState("");
-  const [clients, setClients] = useState([]);
-  const [editableSummary, setEditableSummary] = useState("");
+  const [email, setEmail] = useState("");
+  const [clientName, setClientName] = useState("");
   const [nextStep, setNextStep] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [showSaveButton, setShowSaveButton] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    let storedClients = JSON.parse(localStorage.getItem("agentgpt-crm"));
+  const handleFile = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setFileName(file.name);
+    setLoading(true);
 
-    if (!storedClients || storedClients.length === 0) {
-      storedClients = [
-        {
-          name: "John & Mary Li",
-          type: "buyer",
-          budget: "$1.5M",
-          zip: "Newton, MA",
-          history: [],
-        },
-        {
-          name: "Susan Feld",
-          type: "seller",
-          property: "3BR condo in Brookline",
-          goal: "List in July",
-          history: [],
-        },
-      ];
-      localStorage.setItem("agentgpt-crm", JSON.stringify(storedClients));
-    }
+    const text = await file.text();
 
-    setClients(storedClients);
-  }, []);
-
-  const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
-  };
-
-  const handleUpload = async () => {
-    if (!file || !selectedClient) {
-      alert("Please select a file and client.");
-      return;
-    }
-
-    setStatus("Processing...");
-
-    // Simulate GPT summary generation
-    setTimeout(() => {
-      const mockSummary = `Call Summary: Discussed buyer's timeline, interest in 3-bed homes in Newton, and financing questions.`;
-
-      setSummary(mockSummary);
-      setEditableSummary(mockSummary);
-      setShowSaveButton(true);
-      setStatus("Summary generated. Review and save below.");
-    }, 1500);
-  };
-
-  const handleSaveToClient = () => {
-    const updatedClients = clients.map(client => {
-      if (client.name === selectedClient) {
-        return {
-          ...client,
-          nextStep,
-          dueDate,
-          history: [
-            {
-              date: new Date().toLocaleDateString(),
-              summary: editableSummary,
-              nextStep,
-              dueDate
-            },
-            ...(client.history || [])
-          ]
-        };
-      }
-      return client;
+    // Send to GPT to generate summary and follow-up suggestion
+    const gptResponse = await fetch("/api/summarize", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transcript: text })
     });
 
-    setClients(updatedClients);
-    localStorage.setItem("agentgpt-crm", JSON.stringify(updatedClients));
-    setStatus("✅ Summary + next step saved to client record.");
-    setShowSaveButton(false);
+    const { summary, suggestedNextStep, suggestedDueDate } = await gptResponse.json();
+
+    setSummary(summary);
+    setNextStep(suggestedNextStep || "");
+    setDueDate(suggestedDueDate || "");
+    setLoading(false);
+  };
+
+  const handleSave = () => {
+    if (!clientName || !summary) return alert("Client name and summary required");
+
+    const stored = JSON.parse(localStorage.getItem("agentgpt-crm")) || [];
+    const existing = stored.find((c) => c.name === clientName);
+
+    const newEntry = {
+      summary,
+      nextStep,
+      dueDate,
+      date: new Date().toISOString().split("T")[0],
+    };
+
+    if (existing) {
+      existing.history.push(newEntry);
+    } else {
+      stored.push({ name: clientName, email, history: [newEntry] });
+    }
+
+    localStorage.setItem("agentgpt-crm", JSON.stringify(stored));
+    alert("Saved to CRM");
+    setClientName("");
+    setEmail("");
     setNextStep("");
     setDueDate("");
+    setSummary("");
+    setFileName("");
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Upload a Call Transcript</h1>
+      <h1 className="text-2xl font-bold mb-4">Upload Transcript</h1>
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium mb-1">Select Client</label>
-        <select
-          className="w-full border p-2 rounded"
-          value={selectedClient}
-          onChange={(e) => setSelectedClient(e.target.value)}
-        >
-          <option value="">-- Choose a client --</option>
-          {clients.map((client) => (
-            <option key={client.name} value={client.name}>{client.name}</option>
-          ))}
-        </select>
-      </div>
+      <input type="file" accept=".txt" onChange={handleFile} className="mb-4" />
+      {fileName && <p className="text-sm text-gray-600">{fileName} selected</p>}
 
-      <div className="mb-4">
-        <input type="file" onChange={handleFileChange} className="border p-2" />
-      </div>
+      {loading && <p>Analyzing transcript with GPT...</p>}
 
-      <button
-        onClick={handleUpload}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Generate Summary
-      </button>
-
-      {status && <p className="mt-4 text-sm text-gray-600">{status}</p>}
-
-      {showSaveButton && (
-        <div className="mt-6 bg-white p-4 rounded shadow space-y-4">
-          <h2 className="text-xl font-bold mb-2">Review & Edit Summary</h2>
-
+      {!loading && summary && (
+        <>
           <textarea
-            value={editableSummary}
-            onChange={(e) => setEditableSummary(e.target.value)}
-            className="w-full border p-2 rounded h-32"
+            value={summary}
+            onChange={(e) => setSummary(e.target.value)}
+            rows={8}
+            className="w-full p-2 border rounded mb-4"
           />
 
-          <div>
-            <label className="block font-medium mb-1">Next Step</label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <input
-              type="text"
-              value={nextStep}
-              onChange={(e) => setNextStep(e.target.value)}
-              className="w-full border p-2 rounded"
-              placeholder="e.g., Schedule tour, send new comps"
+              placeholder="Client Name"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              className="p-2 border rounded"
+            />
+            <input
+              placeholder="Client Email (optional)"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="p-2 border rounded"
             />
           </div>
 
-          <div>
-            <label className="block font-medium mb-1">Due Date</label>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-          </div>
+          <input
+            placeholder="Next Step"
+            value={nextStep}
+            onChange={(e) => setNextStep(e.target.value)}
+            className="w-full p-2 border rounded mb-2"
+          />
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="w-full p-2 border rounded mb-4"
+          />
 
           <button
-            onClick={handleSaveToClient}
-            className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            onClick={handleSave}
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
           >
-            Save to Client Record
+            Save to CRM
           </button>
-        </div>
+        </>
       )}
     </div>
   );
