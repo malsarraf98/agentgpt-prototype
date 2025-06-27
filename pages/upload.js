@@ -6,6 +6,8 @@ export default function Upload() {
   const [selectedClient, setSelectedClient] = useState("");
   const [status, setStatus] = useState("");
   const [clients, setClients] = useState([]);
+  const [editableSummary, setEditableSummary] = useState("");
+  const [showSaveButton, setShowSaveButton] = useState(false);
 
   useEffect(() => {
     const storedClients = JSON.parse(localStorage.getItem("agentgpt-crm")) || [];
@@ -28,27 +30,34 @@ export default function Upload() {
     setTimeout(() => {
       const mockSummary = `Call Summary: Discussed buyer's timeline, interest in 3-bed homes in Newton, and financing questions.`;
 
-      const updatedClients = clients.map(client => {
-        if (client.name === selectedClient) {
-          return {
-            ...client,
-            history: [
-              {
-                date: new Date().toLocaleDateString(),
-                summary: mockSummary
-              },
-              ...(client.history || [])
-            ]
-          };
-        }
-        return client;
-      });
-
       setSummary(mockSummary);
-      setStatus("Summary complete.");
-      setClients(updatedClients);
-      localStorage.setItem("agentgpt-crm", JSON.stringify(updatedClients));
+      setEditableSummary(mockSummary);
+      setShowSaveButton(true);
+      setStatus("Summary generated. Review and save below.");
     }, 1500);
+  };
+
+  const handleSaveToClient = () => {
+    const updatedClients = clients.map(client => {
+      if (client.name === selectedClient) {
+        return {
+          ...client,
+          history: [
+            {
+              date: new Date().toLocaleDateString(),
+              summary: editableSummary
+            },
+            ...(client.history || [])
+          ]
+        };
+      }
+      return client;
+    });
+
+    setClients(updatedClients);
+    localStorage.setItem("agentgpt-crm", JSON.stringify(updatedClients));
+    setStatus("✅ Summary saved to client record.");
+    setShowSaveButton(false);
   };
 
   return (
@@ -81,10 +90,21 @@ export default function Upload() {
       </button>
 
       {status && <p className="mt-4 text-sm text-gray-600">{status}</p>}
-      {summary && (
+
+      {showSaveButton && (
         <div className="mt-6 bg-white p-4 rounded shadow">
-          <h2 className="text-xl font-bold mb-2">Summary</h2>
-          <p>{summary}</p>
+          <h2 className="text-xl font-bold mb-2">Review & Edit Summary</h2>
+          <textarea
+            value={editableSummary}
+            onChange={(e) => setEditableSummary(e.target.value)}
+            className="w-full border p-2 rounded h-32"
+          />
+          <button
+            onClick={handleSaveToClient}
+            className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Save to Client Record
+          </button>
         </div>
       )}
     </div>
