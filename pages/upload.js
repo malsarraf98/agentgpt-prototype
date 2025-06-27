@@ -17,11 +17,10 @@ export default function Upload() {
 
     const text = await file.text();
 
-    // Send to GPT to generate summary and follow-up suggestion
     const gptResponse = await fetch("/api/summarize", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ transcript: text })
+      body: JSON.stringify({ transcript: text }),
     });
 
     const { summary, suggestedNextStep, suggestedDueDate } = await gptResponse.json();
@@ -62,16 +61,18 @@ export default function Upload() {
   };
 
   return (
-    <div>
+    <div className="max-w-3xl mx-auto bg-white p-6 shadow rounded">
       <h1 className="text-2xl font-bold mb-4">Upload Transcript</h1>
 
+      <label className="block text-sm font-medium text-gray-700 mb-1">Upload File (.txt)</label>
       <input type="file" accept=".txt" onChange={handleFile} className="mb-4" />
-      {fileName && <p className="text-sm text-gray-600">{fileName} selected</p>}
+      {fileName && <p className="text-sm text-gray-600 mb-2">{fileName} selected</p>}
 
-      {loading && <p>Analyzing transcript with GPT...</p>}
+      {loading && <p className="text-blue-600 font-semibold mb-4">Analyzing transcript with GPT...</p>}
 
       {!loading && summary && (
         <>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Summary</label>
           <textarea
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
@@ -80,32 +81,43 @@ export default function Upload() {
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-            <input
-              placeholder="Client Name"
-              value={clientName}
-              onChange={(e) => setClientName(e.target.value)}
-              className="p-2 border rounded"
-            />
-            <input
-              placeholder="Client Email (optional)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="p-2 border rounded"
-            />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client Name</label>
+              <input
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Client Email (optional)</label>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+            </div>
           </div>
 
-          <input
-            placeholder="Next Step"
-            value={nextStep}
-            onChange={(e) => setNextStep(e.target.value)}
-            className="w-full p-2 border rounded mb-2"
-          />
-          <input
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="w-full p-2 border rounded mb-4"
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Next Step</label>
+              <input
+                value={nextStep}
+                onChange={(e) => setNextStep(e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+              <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+          </div>
 
           <button
             onClick={handleSave}
