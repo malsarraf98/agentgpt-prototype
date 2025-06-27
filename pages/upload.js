@@ -1,49 +1,60 @@
 import { useState } from "react";
 
-export default function Upload() {
-  const [summary, setSummary] = useState(null);
+const mockClients = ["John & Mary Thompson", "Karen Li"];
 
-  const handleUpload = () => {
-    // Mock summary for now — replace with actual GPT output later
-    setSummary({
-      clientType: "Buyer",
-      profile: "Young couple looking for a starter home in Newton around $1.5M.",
-      timeline: "Looking to purchase within 3–6 months.",
-      actionItems: [
-        "Send 5 recent comps under $1.6M in Newton.",
-        "Schedule follow-up call for next week.",
-        "Discuss lender pre-approval process."
-      ],
-      nextMeeting: "Next call: Friday at 10 AM to review comps and financing."
-    });
+export default function Upload() {
+  const [selectedClient, setSelectedClient] = useState("");
+  const [transcript, setTranscript] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = () => {
+    if (selectedClient && transcript) {
+      // Simulate saving it somewhere
+      console.log("Saved:", { selectedClient, transcript });
+      setSubmitted(true);
+      setTranscript("");
+    }
   };
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Upload Call Transcript</h1>
-      <p className="mb-4">Upload a Zoom/phone transcript to generate a client summary.</p>
-      <button
-        onClick={handleUpload}
-        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
-        Simulate Upload
-      </button>
+      <h1 className="text-2xl font-bold mb-4">Upload Meeting Summary</h1>
 
-      {summary && (
-        <div className="mt-6 border p-4 bg-white rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">Client Summary</h2>
-          <p><strong>Type:</strong> {summary.clientType}</p>
-          <p><strong>Profile:</strong> {summary.profile}</p>
-          <p><strong>Timeline:</strong> {summary.timeline}</p>
-          <p className="mt-2 font-semibold">Action Items:</p>
-          <ul className="list-disc list-inside">
-            {summary.actionItems.map((item, idx) => (
-              <li key={idx}>{item}</li>
-            ))}
-          </ul>
-          <p className="mt-2"><strong>Next Meeting:</strong> {summary.nextMeeting}</p>
-        </div>
-      )}
+      <div className="bg-white p-6 rounded shadow max-w-xl">
+        <label className="block mb-2 font-medium">Assign to Client</label>
+        <select
+          className="w-full border rounded p-2 mb-4"
+          value={selectedClient}
+          onChange={(e) => setSelectedClient(e.target.value)}
+        >
+          <option value="">Select client</option>
+          {mockClients.map((name, idx) => (
+            <option key={idx} value={name}>{name}</option>
+          ))}
+        </select>
+
+        <label className="block mb-2 font-medium">Paste Transcript or Summary</label>
+        <textarea
+          className="w-full border rounded p-2 mb-4"
+          rows={5}
+          placeholder="Paste transcript here..."
+          value={transcript}
+          onChange={(e) => setTranscript(e.target.value)}
+        />
+
+        <button
+          className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          onClick={handleSubmit}
+        >
+          Save Summary
+        </button>
+
+        {submitted && (
+          <div className="mt-4 text-green-600">
+            Summary saved for <strong>{selectedClient}</strong>!
+          </div>
+        )}
+      </div>
     </div>
   );
 }
