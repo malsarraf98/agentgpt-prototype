@@ -1,22 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const mockClients = [
+const defaultClients = [
   {
     id: 1,
     name: "John & Mary Thompson",
     type: "Buyer",
     budget: "$1.5M",
     status: "Actively looking",
-    lastMeeting: "June 20, 2025",
     nextStep: "Send 5 new comps + schedule tour Friday",
     history: [
       {
         date: "June 20, 2025",
         summary: "Looking for a starter home in Newton around $1.5M. Wants 3+ beds, good school district. Flexible timeline.",
-      },
-      {
-        date: "June 10, 2025",
-        summary: "Intro call. Discussed needs, ideal location, and financing approval process.",
       },
     ],
   },
@@ -26,7 +21,6 @@ const mockClients = [
     type: "Seller",
     budget: "$950K",
     status: "Preparing to list",
-    lastMeeting: "June 18, 2025",
     nextStep: "Email listing agreement + stager contact",
     history: [
       {
@@ -38,16 +32,27 @@ const mockClients = [
 ];
 
 export default function Clients() {
-  const [clients, setClients] = useState(mockClients);
+  const [clients, setClients] = useState([]);
   const [activeEmail, setActiveEmail] = useState(null);
 
+  useEffect(() => {
+    const saved = localStorage.getItem("agentgpt-crm");
+    if (saved) {
+      setClients(JSON.parse(saved));
+    } else {
+      localStorage.setItem("agentgpt-crm", JSON.stringify(defaultClients));
+      setClients(defaultClients);
+    }
+  }, []);
+
   const generateEmail = (client) => {
+    const latest = client.history?.[0]?.summary || "No recent summary.";
     const email = `
 Hi ${client.name.split(" ")[0]},
 
 It was great speaking with you. Here’s a quick summary of where we left off:
 
-– ${client.history[0].summary}
+– ${latest}
 – Next Step: ${client.nextStep}
 
 Let me know if you have any questions or if you'd like to schedule anything else this week.
@@ -66,7 +71,7 @@ Your Agent
 
       <div className="grid gap-6">
         {clients.map(client => (
-          <div key={client.id} className="bg-white p-4 rounded shadow">
+          <div key={client.name} className="bg-white p-4 rounded shadow">
             <h2 className="text-xl font-semibold">{client.name} <span className="text-sm text-gray-500 ml-2">({client.type})</span></h2>
             <p className="text-sm text-gray-500 mb-2">Status: {client.status} | Budget: {client.budget}</p>
             <p className="mb-2"><strong>Next Step:</strong> {client.nextStep}</p>
@@ -74,7 +79,7 @@ Your Agent
             <div className="mb-4">
               <h3 className="font-semibold mb-1">Meeting History:</h3>
               <ul className="list-disc pl-5 space-y-1 text-sm">
-                {client.history.map((item, idx) => (
+                {client.history?.map((item, idx) => (
                   <li key={idx}><strong>{item.date}:</strong> {item.summary}</li>
                 ))}
               </ul>
