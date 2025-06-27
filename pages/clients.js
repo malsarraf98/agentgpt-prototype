@@ -8,8 +8,17 @@ const mockClients = [
     budget: "$1.5M",
     status: "Actively looking",
     lastMeeting: "June 20, 2025",
-    summary: "Looking for a starter home in Newton around $1.5M. Wants 3+ beds, good school district. Flexible on timeline, aiming for late summer move.",
     nextStep: "Send 5 new comps + schedule tour Friday",
+    history: [
+      {
+        date: "June 20, 2025",
+        summary: "Looking for a starter home in Newton around $1.5M. Wants 3+ beds, good school district. Flexible timeline.",
+      },
+      {
+        date: "June 10, 2025",
+        summary: "Intro call. Discussed needs, ideal location, and financing approval process.",
+      },
+    ],
   },
   {
     id: 2,
@@ -18,8 +27,13 @@ const mockClients = [
     budget: "$950K",
     status: "Preparing to list",
     lastMeeting: "June 18, 2025",
-    summary: "Wants to list her 2BR condo in Somerville. Discussed pricing strategy and staging. Target list date: July 10.",
     nextStep: "Email listing agreement + stager contact",
+    history: [
+      {
+        date: "June 18, 2025",
+        summary: "Discussed pricing strategy and staging. Target list date: July 10.",
+      },
+    ],
   },
 ];
 
@@ -33,7 +47,7 @@ Hi ${client.name.split(" ")[0]},
 
 It was great speaking with you. Here’s a quick summary of where we left off:
 
-– ${client.summary}
+– ${client.history[0].summary}
 – Next Step: ${client.nextStep}
 
 Let me know if you have any questions or if you'd like to schedule anything else this week.
@@ -55,9 +69,17 @@ Your Agent
           <div key={client.id} className="bg-white p-4 rounded shadow">
             <h2 className="text-xl font-semibold">{client.name} <span className="text-sm text-gray-500 ml-2">({client.type})</span></h2>
             <p className="text-sm text-gray-500 mb-2">Status: {client.status} | Budget: {client.budget}</p>
-            <p className="text-gray-800 mb-2"><strong>Last Meeting:</strong> {client.lastMeeting}</p>
-            <p className="mb-2"><strong>Summary:</strong> {client.summary}</p>
-            <p className="mb-4"><strong>Next Step:</strong> {client.nextStep}</p>
+            <p className="mb-2"><strong>Next Step:</strong> {client.nextStep}</p>
+
+            <div className="mb-4">
+              <h3 className="font-semibold mb-1">Meeting History:</h3>
+              <ul className="list-disc pl-5 space-y-1 text-sm">
+                {client.history.map((item, idx) => (
+                  <li key={idx}><strong>{item.date}:</strong> {item.summary}</li>
+                ))}
+              </ul>
+            </div>
+
             <button
               onClick={() => generateEmail(client)}
               className="bg-indigo-600 text-white px-4 py-1 rounded hover:bg-indigo-700"
