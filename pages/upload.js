@@ -8,12 +8,32 @@ export default function Upload() {
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = () => {
-    if (selectedClient && transcript) {
-      // Simulate saving it somewhere
-      console.log("Saved:", { selectedClient, transcript });
-      setSubmitted(true);
-      setTranscript("");
-    }
+    if (!selectedClient || !transcript) return;
+
+    // Load existing CRM from localStorage
+    const stored = JSON.parse(localStorage.getItem("agentgpt-crm")) || [];
+
+    // Find the client
+    const updated = stored.map(client => {
+      if (client.name === selectedClient) {
+        return {
+          ...client,
+          history: [
+            {
+              date: new Date().toLocaleDateString(),
+              summary: transcript,
+            },
+            ...(client.history || []),
+          ],
+        };
+      }
+      return client;
+    });
+
+    localStorage.setItem("agentgpt-crm", JSON.stringify(updated));
+    setTranscript("");
+    setSelectedClient("");
+    setSubmitted(true);
   };
 
   return (
