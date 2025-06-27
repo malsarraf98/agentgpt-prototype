@@ -7,6 +7,7 @@ export default function Layout({ children }) {
         <h1 className="text-xl font-bold">AgentGPT</h1>
         <nav className="flex flex-col space-y-2">
           <Link href="/" className="hover:underline">Home</Link>
+          <Link href="/dashboard" className="hover:underline">Dashboard</Link>
           <Link href="/upload" className="hover:underline">Upload</Link>
           <Link href="/buyer" className="hover:underline">Buyer</Link>
           <Link href="/seller" className="hover:underline">Seller</Link>
