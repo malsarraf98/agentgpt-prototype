@@ -29,7 +29,7 @@ export default function Layout({ children }) {
       <div className="flex">
         {/* Sidebar */}
         <div
-          className={\`\${sidebarOpen ? 'block' : 'hidden'} md:block bg-white shadow-md w-48 space-y-4 py-6 px-4 absolute md:relative z-10 md:z-auto md:static top-14 left-0 md:top-0\`}
+          className={`${sidebarOpen ? 'block' : 'hidden'} md:block bg-white shadow-md w-48 space-y-4 py-6 px-4 absolute md:relative z-10 md:z-auto md:static top-14 left-0 md:top-0`}
         >
           <div className="flex items-center mb-6">
             <Image src="/brivo-logo.png" alt="Brivo" width={30} height={30} />
