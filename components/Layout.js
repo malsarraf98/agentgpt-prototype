@@ -1,14 +1,15 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Layout({ children }) {
   return (
     <div className="flex h-screen font-sans">
-      <aside className="w-64 bg-teal-700 text-white p-6 space-y-6">
+      <aside className="w-64 bg-[#00BFA6] text-white p-6 space-y-6">
         <div className="flex items-center space-x-2">
-          <div className="text-3xl">🏠</div>
-          <h1 className="text-2xl font-bold">Brivo</h1>
+          <Image src="/brivo-logo.png" alt="Brivo Logo" width={40} height={40} />
+          <span className="text-2xl font-semibold tracking-tight">Brivo</span>
         </div>
-        <nav className="flex flex-col space-y-2">
+        <nav className="flex flex-col space-y-3 mt-4">
           <Link href="/" className="hover:underline">Home</Link>
           <Link href="/upload" className="hover:underline">Upload</Link>
           <Link href="/buyer" className="hover:underline">Buyer</Link>
@@ -18,7 +19,7 @@ export default function Layout({ children }) {
           <Link href="/dashboard" className="hover:underline">Dashboard</Link>
         </nav>
       </aside>
-      <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
+      <main className="flex-1 p-6 bg-white overflow-y-auto">
         {children}
       </main>
     </div>
