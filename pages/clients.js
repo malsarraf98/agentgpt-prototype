@@ -1,41 +1,36 @@
 import { useState } from 'react';
-import Layout from '@/components/Layout';
-import ClientCard from '@/components/ClientCard';
-import clients from '@/data/clients-data';
+import clientsData from '../data/clients-data';
+import ClientCard from '../components/ClientCard';
 
 export default function ClientsPage() {
-  const [filterTag, setFilterTag] = useState('All');
+  const [filter, setFilter] = useState('All');
 
-  const filteredClients = filterTag === 'All'
-    ? clients
-    : clients.filter(client => client.tag.toLowerCase() === filterTag.toLowerCase());
+  const filteredClients =
+    filter === 'All'
+      ? clientsData
+      : clientsData.filter((client) => client.tag === filter);
 
   return (
-    <Layout>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-bold mb-4">Clients</h1>
-
-        <div className="mb-4">
-          <label htmlFor="tagFilter" className="mr-2 font-medium">Filter by Tag:</label>
-          <select
-            id="tagFilter"
-            value={filterTag}
-            onChange={e => setFilterTag(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md"
-          >
-            <option>All</option>
-            <option>Buyer</option>
-            <option>Seller</option>
-            <option>Investor</option>
-          </select>
-        </div>
-
-        <div className="space-y-4">
-          {filteredClients.map(client => (
-            <ClientCard key={client.id} client={client} />
-          ))}
-        </div>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Clients</h1>
+        <select
+          className="border p-2 rounded"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        >
+          <option value="All">All</option>
+          <option value="Buyer">Buyer</option>
+          <option value="Seller">Seller</option>
+          <option value="Investor">Investor</option>
+        </select>
       </div>
-    </Layout>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredClients.map((client) => (
+          <ClientCard key={client.id} client={client} />
+        ))}
+      </div>
+    </div>
   );
 }
