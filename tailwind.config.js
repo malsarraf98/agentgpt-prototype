@@ -1,21 +1,16 @@
-// tailwind.config.js
-
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
+    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       colors: {
         brivo: {
-          teal: '#287b84',
-          light: '#f9fafb',
-          white: '#ffffff',
+          teal: '#00BFA6',
+          dark: '#0C1D1D',
         },
-      },
-      fontFamily: {
-        sans: ['Inter', 'sans-serif'],
       },
     },
   },
