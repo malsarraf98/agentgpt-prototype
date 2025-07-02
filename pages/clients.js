@@ -15,7 +15,7 @@ export default function ClientsPage() {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Clients</h1>
         <select
-          className="border p-2 rounded"
+          className="border border-gray-300 p-2 rounded"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
