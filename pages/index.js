@@ -1,23 +1,49 @@
+import Image from "next/image";
+import Head from "next/head";
+
 export default function Home() {
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <h1 className="text-4xl font-bold text-brivo-dark">Welcome to Brivo</h1>
-      <p className="text-lg text-gray-700">
-        Brivo is your AI-powered operating system for modern real estate agents.
-      </p>
+    <>
+      <Head>
+        <title>Brivo – AI for Real Estate Agents</title>
+      </Head>
+      <div className="min-h-screen bg-white text-gray-900">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <div className="mb-16 text-center">
+            <div className="flex justify-center mb-6">
+              <Image src="/brivo-logo.png" alt="Brivo Logo" width={100} height={100} />
+            </div>
+            <h1 className="text-5xl font-bold tracking-tight text-gray-900">
+              Welcome to <span className="text-teal-600">Brivo</span>
+            </h1>
+            <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
+              Your AI-powered operating system for modern real estate agents.
+            </p>
+          </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6 border border-gray-100">
-        <h2 className="text-2xl font-semibold text-brivo-dark mb-2">Example Client Summary</h2>
-        <p><strong>Name:</strong> Jane Smith</p>
-        <p><strong>Needs:</strong> 3 bed, 2 bath home near good schools</p>
-        <p><strong>Status:</strong> Actively touring</p>
-      </div>
+          <div className="bg-gray-50 p-8 rounded-2xl shadow-md mb-12">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">🧠 Example Client Summary</h2>
+            <div className="text-gray-700 space-y-2 leading-relaxed">
+              <p><strong>Name:</strong> Jane Smith</p>
+              <p><strong>Needs:</strong> 3 bed, 2 bath home near good schools</p>
+              <p><strong>Status:</strong> Actively touring</p>
+            </div>
+          </div>
 
-      <div className="bg-white shadow-md rounded-lg p-6 border border-gray-100">
-        <h2 className="text-2xl font-semibold text-brivo-dark mb-2">Walkthrough Demo</h2>
-        <p>Click "Upload" to generate a client summary from a transcript.</p>
-        <p>View saved clients in "Clients". Use "Buyer" and "Seller" tools to assist prospects.</p>
+          <div className="bg-white p-8 rounded-2xl border border-gray-200 shadow-sm">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-800">🚀 Walkthrough Demo</h2>
+            <p className="text-gray-700 mb-2">
+              Click <strong>“Upload”</strong> to generate a client summary from a transcript.
+            </p>
+            <p className="text-gray-700 mb-2">
+              View saved clients in <strong>“Clients”</strong>. Use <strong>“Buyer”</strong> and <strong>“Seller”</strong> tools to assist prospects.
+            </p>
+            <p className="text-gray-700">
+              The <strong>“Market Summary”</strong> and <strong>“Dashboard”</strong> tabs provide insights and track your performance.
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
