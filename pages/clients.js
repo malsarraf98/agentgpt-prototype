@@ -1,4 +1,4 @@
-import ClientCard from '@/components/ClientCard';
+import ClientCard from '../components/ClientCard';
 
 const sampleClients = [
   {
