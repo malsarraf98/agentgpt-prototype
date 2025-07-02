@@ -10,7 +10,9 @@ export default function ClientsPage() {
         {clients.length === 0 ? (
           <p className="text-gray-600">No clients uploaded yet.</p>
         ) : (
-          clients.map((client, index) => <ClientCard key={index} client={client} />)
+          clients.map((client, index) => (
+            <ClientCard key={index} client={client} />
+          ))
         )}
       </div>
     </Layout>
